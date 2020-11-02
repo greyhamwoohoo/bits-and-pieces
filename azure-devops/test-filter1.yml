@@ -1,0 +1,104 @@
+# POC/Reference:
+# Queue a build and select one of (unit-tests, integration-tests, system-tests)
+#    Conditionally runs the stage for those tests
+#    Specifies a test filter that could be passed to vstest.console.exe or vstest
+#
+trigger: none
+pr: none
+
+name: 1.0$(Rev:.r)
+
+parameters:
+- name: testproject
+  displayName: Test Project
+  type: string
+  default: integration-tests
+  values:
+  - unit-tests
+  - integration-tests
+  - system-tests
+- name: testcasefilter
+  type: string
+  default: "--TestCaseFilter:FullyQualifiedName~something"
+
+variables:
+  - name: Build.Configuration
+    value: Release
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: windows-2019
+
+    steps:
+    - powershell:
+        # TODO: Use a dictionary
+        if("${{ parameters.testproject}}" -eq "unit-tests") {
+          Write-Host "##vso[task.setvariable variable=THE_TEST_PROJECT_DLL;]UnitTests.dll"   
+        }
+        if("${{ parameters.testproject}}" -eq "integration-tests") {
+          Write-Host "##vso[task.setvariable variable=THE_TEST_PROJECT_DLL;]IntegrationTests.dll"
+        }
+        if("${{ parameters.testproject}}" -eq "system-tests") {
+          Write-Host "##vso[task.setvariable variable=THE_TEST_PROJECT_DLL;]SystemTests.dll"
+        }        
+      displayName: "Choose DLL from Project Name"
+    # Other way:
+    #- ${{ if eq(parameters.testproject, 'unit-tests') }}:
+    #    - powershell: Write-Host "##vso[task.setvariable variable=THE_TEST_PROJECT_DLL;]UnitTests.dll"    
+    #- ${{ if eq(parameters.testproject, 'integration-tests') }}:
+    #    - powershell: Write-Host "##vso[task.setvariable variable=THE_TEST_PROJECT_DLL;]IntegrationTests.dll"
+    #- ${{ if eq(parameters.testproject, 'system-tests') }}:
+    #    - powershell: Write-Host "##vso[task.setvariable variable=THE_TEST_PROJECT_DLL;]SystemTests.dll"
+    - powershell: |
+        Write-Host ${{ parameters.testproject }}
+        if($env:THE_TEST_PROJECT_DLL -eq $null) { 
+          throw "ERROR: Test project is not known. "
+        }
+      displayName: "Verify Selection"
+
+    - powershell: |
+        Write-Host "The test project selected is $($env:THE_TEST_PROJECT_DLL)"
+        Write-Host "The filter is: ${{ parameters.testcasefilter }}"
+      displayName: "Dump selection"
+
+- stage: UnitTests
+  condition: eq('${{ parameters.testproject }}', 'unit-tests')
+  jobs:
+  - job: UnitTests
+    pool:
+      vmImage: windows-2019
+
+    steps:
+    - powershell: |
+        Write-Host "The test project selected is $($env:THE_TEST_PROJECT_DLL)"
+        Write-Host "The filter is: ${{ parameters.testcasefilter }}"
+      displayName: "Dump selection"
+
+- stage: IntegrationTests
+  condition: eq('${{ parameters.testproject }}', 'integration-tests')
+  jobs:
+  - job: IntegrationTests
+    pool:
+      vmImage: windows-2019
+
+    steps:
+    - powershell: |
+        Write-Host "The test project selected is $($env:THE_TEST_PROJECT_DLL)"
+        Write-Host "The filter is: ${{ parameters.testcasefilter }}"
+      displayName: "Dump selection"
+
+- stage: SystemTests
+  condition: eq('${{ parameters.testproject }}', 'system-tests')
+  jobs:
+  - job: SystemTests
+    pool:
+      vmImage: windows-2019
+
+    steps:
+    - powershell: |
+        Write-Host "The test project selected is $($env:THE_TEST_PROJECT_DLL)"
+        Write-Host "The filter is: ${{ parameters.testcasefilter }}"
+      displayName: "Dump selection"
