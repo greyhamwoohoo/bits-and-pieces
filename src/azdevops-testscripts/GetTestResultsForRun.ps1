@@ -10,6 +10,9 @@
 
 # Pre-req:
 # Install-Module VsTeam 
+#
+# See VsTeam Getting Started Documentation - you need to set the profile first:
+# https://methodsandpractices.github.io/vsteam-docs/docs/modules/vsteam/about/about_vsteam_profiles.help/
 Set-StrictMode -Version Latest
 $ErrorActionPreference="Stop"
 $VerbosePreference="Continue"
