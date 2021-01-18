@@ -17,7 +17,30 @@ if(categories.ToList().Contains("TheForbiddenCategory")) {
 ```
 
 ## Limitations
-See the Unit Test for coverage
+See the Unit Test for coverage. 
 
-Main limitation: Test Categories are not retrieved from 'containing types'. ie: outer classes of the test class. 
+### Containment
+NUnit Test Categories do not include or exclude based on nested types/classes (so neither does this code).
 
+For example - given a class like this: 
+
+```
+        [Category("OuterClassCategory")]
+        public class OuterTestClass
+        {
+            public class InnerTestClass
+            {
+                [Test]
+                public void CanRetrieveOuterClassCategory()
+                {
+
+                }
+            }
+        }
+```
+
+The following command will NOT run the test:
+
+```
+vstest.console.exe ResultingCategoryTests.dll --TestCaseFilter:TestCategory=OuterClassCategory
+```
