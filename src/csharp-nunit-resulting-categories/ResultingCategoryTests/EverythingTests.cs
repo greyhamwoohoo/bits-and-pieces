@@ -21,9 +21,8 @@ namespace ResultingCategoryTests
             [Category("TheMethodCategory")]
             public void TheCategoriesAreUnioned()
             {
-                var provider = new ResultingCategoryProvider();
-
-                var result = provider.GetCategories(TestContext.CurrentContext.Test);
+                var result = new ResultingCategoryBuilder()
+                    .Build(fromTest: TestContext.CurrentContext.Test);
 
                 result.Should().HaveCount(4, because: "there are two categories on this Test");
                 result.Cast<string>().Should().Contain("TheMethodCategory", because: "it is one of the Categories on this hierarchy. ");

@@ -6,31 +6,35 @@ using static NUnit.Framework.TestContext;
 
 namespace ResultingCategoryTests
 {
-    public class ResultingCategoryProvider
+    public class ResultingCategoryBuilder
     {
-        /// <summary>
-        /// Get the Categories from the Method, Class and Base Classes. 
-        /// </summary>
-        /// <param name="testAdapter">NUnit Test Adapter (from the Nunit test context)</param>
-        /// <returns>A distinct union of the categories on the test method, its class and any base classes. </returns>
-        public IEnumerable<string> GetCategories(TestAdapter testAdapter)
+        public ResultingCategoryBuilder()
         {
-            var classType = GetClasses().Where(t => t.FullName == testAdapter.ClassName).FirstOrDefault();
-            return GetCategories(testAdapter, classType);
         }
 
         /// <summary>
         /// Get the Categories from the Method, Class and Base Classes. 
         /// </summary>
-        /// <param name="testAdapter">NUnit Test Adapter (from the Nunit test context)</param>
-        /// <param name="classType">Optional test class type. If null, the entire AppDomain and Assemblies will be scanned. </param>
+        /// <param name="fromTest">NUnit Test Adapter (from the Nunit test context)</param>
         /// <returns>A distinct union of the categories on the test method, its class and any base classes. </returns>
-        public IEnumerable<string> GetCategories(TestAdapter testAdapter, Type classType)
+        public IEnumerable<string> Build(TestAdapter fromTest)
+        {
+            var classType = GetClasses().Where(t => t.FullName == fromTest.ClassName).FirstOrDefault();
+            return GetCategories(fromTest, classType);
+        }
+
+        /// <summary>
+        /// Get the Categories from the Method, Class and Base Classes. 
+        /// </summary>
+        /// <param name="fromTest">NUnit Test Adapter (from the Nunit test context)</param>
+        /// <param name="inClass">Optional test class type. If null, the entire AppDomain and Assemblies will be scanned. </param>
+        /// <returns>A distinct union of the categories on the test method, its class and any base classes. </returns>
+        public IEnumerable<string> GetCategories(TestAdapter fromTest, Type inClass)
         {
             var result = new List<string>();
 
             // Class Hierarchy
-            var classes = ToClassHierarchy(classType);
+            var classes = ToClassHierarchy(inClass);
             foreach(var c in classes)
             {
                 result.AddRange(c
@@ -39,9 +43,9 @@ namespace ResultingCategoryTests
             };
 
             // Method
-            foreach (var key in testAdapter.Properties.Keys)
+            foreach (var key in fromTest.Properties.Keys)
             {
-                var value = testAdapter.Properties[key];
+                var value = fromTest.Properties[key];
                 result.AddRange(value.Select(o => o.ToString()));
             }
 
