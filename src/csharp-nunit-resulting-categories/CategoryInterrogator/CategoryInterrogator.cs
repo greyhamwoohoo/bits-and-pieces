@@ -4,38 +4,33 @@ using System.Collections.Generic;
 using System.Linq;
 using static NUnit.Framework.TestContext;
 
-namespace ResultingCategoryTests
+namespace CategoryInterrogator
 {
-    public class ResultingCategoryBuilder
+    /// <summary>
+    /// Union distinct Category attributes on the test, class and class hierarchy. 
+    /// </summary>
+    public class CategoryInterrogator
     {
-        public ResultingCategoryBuilder()
+        public CategoryInterrogator()
         {
         }
 
-        /// <summary>
-        /// Get the Categories from the Method, Class and Base Classes. 
-        /// </summary>
-        /// <param name="fromTest">NUnit Test Adapter (from the Nunit test context)</param>
-        /// <returns>A distinct union of the categories on the test method, its class and any base classes. </returns>
-        public IEnumerable<string> Build(TestAdapter fromTest)
+        public IEnumerable<string> Interrogate(TestAdapter test)
         {
-            var classType = GetClasses().Where(t => t.FullName == fromTest.ClassName).FirstOrDefault();
-            return GetCategories(fromTest, classType);
+            var classType = GetClasses()
+                .Where(t => t.FullName == test.ClassName)
+                .FirstOrDefault();
+
+            return Interrogate(test, classType);
         }
 
-        /// <summary>
-        /// Get the Categories from the Method, Class and Base Classes. 
-        /// </summary>
-        /// <param name="fromTest">NUnit Test Adapter (from the Nunit test context)</param>
-        /// <param name="inClass">Optional test class type. If null, the entire AppDomain and Assemblies will be scanned. </param>
-        /// <returns>A distinct union of the categories on the test method, its class and any base classes. </returns>
-        public IEnumerable<string> GetCategories(TestAdapter fromTest, Type inClass)
+        public IEnumerable<string> Interrogate(TestAdapter test, Type inClass)
         {
             var result = new List<string>();
 
             // Class Hierarchy
             var classes = ToClassHierarchy(inClass);
-            foreach(var c in classes)
+            foreach (var c in classes)
             {
                 result.AddRange(c
                     .GetCustomAttributes(typeof(CategoryAttribute), inherit: false)
@@ -43,9 +38,9 @@ namespace ResultingCategoryTests
             };
 
             // Method
-            foreach (var key in fromTest.Properties.Keys)
+            foreach (var key in test.Properties.Keys.Where(k => k == "Category"))
             {
-                var value = fromTest.Properties[key];
+                var value = test.Properties[key];
                 result.AddRange(value.Select(o => o.ToString()));
             }
 

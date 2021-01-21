@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using System.Linq;
 
-namespace ResultingCategoryTests
+namespace CategoryInterrogator
 {
     public class WhenLotsOfThingsHaveCategories
     {
@@ -21,8 +21,8 @@ namespace ResultingCategoryTests
             [Category("TheMethodCategory")]
             public void TheCategoriesAreUnioned()
             {
-                var result = new ResultingCategoryBuilder()
-                    .Build(fromTest: TestContext.CurrentContext.Test);
+                var result = new CategoryInterrogator()
+                    .Interrogate(test: TestContext.CurrentContext.Test);
 
                 result.Should().HaveCount(4, because: "there are two categories on this Test");
                 result.Cast<string>().Should().Contain("TheMethodCategory", because: "it is one of the Categories on this hierarchy. ");

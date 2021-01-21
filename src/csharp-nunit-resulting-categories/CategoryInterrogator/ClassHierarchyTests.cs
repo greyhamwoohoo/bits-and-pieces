@@ -2,7 +2,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Linq;
 
-namespace ResultingCategoryTests
+namespace CategoryInterrogator
 {
     public class WhenRetrievingCategoriesFromClassesInAHierarchy
     {
@@ -20,8 +20,8 @@ namespace ResultingCategoryTests
             [Test]
             public void NoCategoriesAreRetrieved()
             {
-                var result = new ResultingCategoryBuilder()
-                    .Build(fromTest: TestContext.CurrentContext.Test);
+                var result = new CategoryInterrogator()
+                    .Interrogate(test: TestContext.CurrentContext.Test);
 
                 result.Should().HaveCount(0, because: "there are no Category attributes on this Test Class hierarchy. ");
             }
@@ -32,8 +32,8 @@ namespace ResultingCategoryTests
             [Test]
             public void OneCategoryIsRetrieved()
             {
-                var result = new ResultingCategoryBuilder()
-                    .Build(fromTest: TestContext.CurrentContext.Test);
+                var result = new CategoryInterrogator()
+                    .Interrogate(test: TestContext.CurrentContext.Test);
 
                 result.Should().HaveCount(1, because: "there is a single Category on this Test Class hierarchy");
                 result.First().Should().Be("TheBaseClassCategory", because: "there is exactly one Category on this Test Method hierarchy");
@@ -46,8 +46,8 @@ namespace ResultingCategoryTests
             [Test]
             public void TwoCategoriesAreRetrieved()
             {
-                var result = new ResultingCategoryBuilder()
-                    .Build(fromTest: TestContext.CurrentContext.Test);
+                var result = new CategoryInterrogator()
+                    .Interrogate(test: TestContext.CurrentContext.Test);
 
                 result.Should().HaveCount(2, because: "there are two categories on this Test Class Hierarchy. ");
                 result.Cast<string>().Should().Contain("TheClassCategory", because: "it is one of the Categories on this Class Hierarchy. ");

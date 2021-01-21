@@ -42,5 +42,5 @@ For example - given a class like this:
 The following command will NOT run the test:
 
 ```
-vstest.console.exe ResultingCategoryTests.dll --TestCaseFilter:TestCategory=OuterClassCategory
+vstest.console.exe CategoryInterrogator.dll --TestCaseFilter:TestCategory=OuterClassCategory
 ```

@@ -2,15 +2,15 @@ using FluentAssertions;
 using NUnit.Framework;
 using System.Linq;
 
-namespace ResultingCategoryTests
+namespace CategoryInterrogator
 {
     public class WhenRetrievingCategoriesFromMethods
     {
         [Test]
         public void NoCategoriesAreRetrieved()
         {
-            var result = new ResultingCategoryBuilder()
-                .Build(fromTest: TestContext.CurrentContext.Test);
+            var result = new CategoryInterrogator()
+                .Interrogate(test: TestContext.CurrentContext.Test);
 
             result.Should().HaveCount(0, because: "there are no Category attributes on this test. ");
         }
@@ -19,8 +19,8 @@ namespace ResultingCategoryTests
         [Category("TheCategory")]
         public void ASingleCategoryIsRetrieved()
         {
-            var result = new ResultingCategoryBuilder()
-                .Build(fromTest: TestContext.CurrentContext.Test);
+            var result = new CategoryInterrogator()
+                .Interrogate(test: TestContext.CurrentContext.Test);
 
             result.Should().HaveCount(1, because: "there is a single Category on this test");
             result.First().Should().Be("TheCategory", because: "there is exactly one Category on this method called TheCategory");
@@ -31,8 +31,8 @@ namespace ResultingCategoryTests
         [Category("TheOtherCategory")]
         public void MultipleCategoriesAreRetrieved()
         {
-            var result = new ResultingCategoryBuilder()
-                .Build(fromTest: TestContext.CurrentContext.Test);
+            var result = new CategoryInterrogator()
+                .Interrogate(test: TestContext.CurrentContext.Test);
 
             result.Should().HaveCount(2, because: "there are two categories on this Test");
             result.Cast<string>().Should().Contain("TheCategory", because: "it is one of the Categories on this test. ");
@@ -44,8 +44,8 @@ namespace ResultingCategoryTests
         [Category("TheCategory")]
         public void IdenticalCategoriesAreSquashedToASingleOne()
         {
-            var result = new ResultingCategoryBuilder()
-                .Build(fromTest: TestContext.CurrentContext.Test);
+            var result = new CategoryInterrogator()
+                .Interrogate(test: TestContext.CurrentContext.Test);
 
             result.Should().HaveCount(1, because: "while there are two Category attributes, they are identical. ");
             result.Cast<string>().Should().Contain("TheCategory", because: "it is the only Category on this test. ");
