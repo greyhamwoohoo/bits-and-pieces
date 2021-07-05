@@ -9,6 +9,6 @@ terraform {
 
 provider "aws" {
   region = "ap-southeast-2"
-  # AWS Profile to configure AWS (Production Account)
-  profile = "prod-administrator"
+  # AWS Profile to configure AWS (Developer Account)
+  profile = "dev-administrator"
 }
