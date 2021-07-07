@@ -27,6 +27,11 @@ resource "aws_iam_policy" "developer_codecommit_role_policy" {
           "arn:aws:codecommit:ap-southeast-2:${var.production_account_id}:*"
         ]
       },
+      {
+        "Effect" : "Allow",
+        "Action" : "codecommit:ListRepositories",
+        "Resource" : "*"
+      }
     ]
   })
 }
